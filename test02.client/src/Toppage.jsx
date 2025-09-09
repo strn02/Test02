@@ -83,9 +83,9 @@ export default function TopPage({ onLogout }) {
 
             <main className="main-content">
                 {loading && <div className="loading">読み込み中...</div>}
-                {err && <div className="error">{err}</div>}
+                {error && <div className="error">{error}</div>}
 
-                {!loading && !err && (
+                {!loading && !error && (
                     <>
                         <h1 className="emp-name">{me?.name || '社員指名'}</h1>
 

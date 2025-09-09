@@ -39,10 +39,9 @@ const Login = ({ onLoginSuccess }) => {
     return (
         <div className="login-container">
             <form className="login-form" onSubmit={handleSubmit}>
-                <h2 className="login-title">PC貸出管理システム</h2>
-                {error.general && <div className="error-message">{error.general}</div>}
+                <h2 className="login-title">Login</h2>
                 <div className="form-group">
-                    <label className="form-label">ユーザーID</label>
+                    <label className="form-label">ID</label>
                     <input
                         type="text"
                         value={id}
@@ -52,7 +51,7 @@ const Login = ({ onLoginSuccess }) => {
                     />
                 </div>
                 <div className="form-group">
-                    <label className="form-label">パスワード</label>
+                    <label className="form-label">Password</label>
                     <input
                         type="password"
                         value={password}
@@ -61,7 +60,8 @@ const Login = ({ onLoginSuccess }) => {
                         className="form-input"
                     />
                 </div>
-                <button type="submit" className="login-btn">ログイン</button>
+                {error.general && <div className="error-message">{error.general}</div>}
+                <button type="submit" className="login-btn">Login</button>
             </form>
         </div>
     );
