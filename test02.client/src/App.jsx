@@ -1,27 +1,32 @@
-import React, { useState } from 'react';
-import Login from './login/Login.jsx';
-import TopPage from './TopPage.jsx';
-import './App.css';
+// src/App.jsx
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+import Login from "./login/Login";
+import TopPage from "./pages/TopPage";
+import RentalPage from "./pages/RentalPage";
+import UsersPage from "./pages/UsersPage";
+import AssetsPage from "./pages/AssetsPage";
+import MainLayout from "./layout/MainLayout";
 
-const App = () => {
-    const [currentPage, setCurrentPage] = useState('login');
-
-    const handleLoginSuccess = (employeeNo) => {
-        localStorage.setItem('auth', JSON.stringify({ employeeNo, loginAt: Date.now() }));
-        setCurrentPage('topPage');
-    };
-
-    const handleLogout = () => {
-        localStorage.removeItem('auth');
-        setCurrentPage('login');
-    };
-
+function App() {
     return (
-        <div className={`app ${currentPage === 'login' ? 'center' : ''}`}>
-            {currentPage === 'login' && <Login onLoginSuccess={handleLoginSuccess} />}
-            {currentPage === 'topPage' && <TopPage onLoginSuccess={handleLoginSuccess} />}
-        </div>
+        <BrowserRouter>
+            <Routes>
+                {/* ログインページ */}
+                <Route path="/login" element={<Login />} />
+
+                {/* サイドバー付きのページたち */}
+                <Route element={<MainLayout />}>
+                    <Route path="/top" element={<TopPage />} />
+                    <Route path="/rental" element={<RentalPage />} />
+                    <Route path="/users" element={<UsersPage />} />
+                    <Route path="/assets" element={<AssetsPage />} />
+                </Route>
+
+                {/* デフォルトは /login に飛ばす */}
+                <Route path="*" element={<Navigate to="/login" replace />} />
+            </Routes>
+        </BrowserRouter>
     );
-};
+}
 
 export default App;

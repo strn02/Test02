@@ -1,11 +1,14 @@
-﻿import React, { useState } from 'react';
-import './Login.css';
+﻿import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import "./Login.css";
 
-const Login = ({ onLoginSuccess }) => {
+const Login = () => {
     const [id, setId] = useState("");
     const [password, setPassword] = useState("");
     const [error, setError] = useState({});
     const [loading, setLoading] = useState(false);
+
+    const navigate = useNavigate();
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -13,24 +16,26 @@ const Login = ({ onLoginSuccess }) => {
         setLoading(true);
 
         try {
-            const response = await fetch('/auth/login', {
-                method: 'POST',
-                headers: { 'Content-type': 'application/json' },
-                body: JSON.stringify({ employeeNo: id, password })
+            const response = await fetch("/auth/login", {
+                method: "POST",
+                headers: { "Content-type": "application/json" },
+                body: JSON.stringify({ employeeNo: id, password }),
             });
 
             const data = await response.json().catch(() => ({}));
 
             if (response.ok) {
                 // ログイン成功
+                localStorage.setItem("auth", JSON.stringify(data));
                 alert(data.message);
-                onLoginSuccess(data.employeeNo ?? id);
+
+                // ✅ React Router で /top に遷移
+                navigate("/top");
             } else {
-                setError({ general: data.message || 'ログインに失敗' });
-                // ログイン失敗
+                setError({ general: data.message || "ログインに失敗" });
             }
         } catch {
-            setError({ general: 'サーバーに接続できません' });
+            setError({ general: "サーバーに接続できません" });
         } finally {
             setLoading(false);
         }
@@ -61,7 +66,9 @@ const Login = ({ onLoginSuccess }) => {
                     />
                 </div>
                 {error.general && <div className="error-message">{error.general}</div>}
-                <button type="submit" className="login-btn">Login</button>
+                <button type="submit" className="login-btn" disabled={loading}>
+                    {loading ? "ログイン中..." : "Login"}
+                </button>
             </form>
         </div>
     );
