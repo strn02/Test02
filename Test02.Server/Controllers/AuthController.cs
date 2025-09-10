@@ -29,23 +29,43 @@ namespace Test02.Server.Controllers
         {
             var emp = (login.EmployeeNo ?? "").Trim();
             var pass = (login.Password ?? "").Trim();
+
             if (emp.Length == 0 || pass.Length == 0)
                 return Unauthorized(new { message = "IDまたはパスワードが正しくありません" });
             try
             {
                 if (_connection.State != ConnectionState.Open)
                     await _connection.OpenAsync();
+
                 const string sql = @"SELECT password_hash FROM auth_user WHERE employee_no = @employee_no";
                 using var cmd = new NpgsqlCommand(sql, _connection);
                 cmd.Parameters.AddWithValue("employee_no", emp);
                 using var reader = await cmd.ExecuteReaderAsync();
+
                 if (!await reader.ReadAsync())
                     return Unauthorized(new { message = "IDorパスワードが正しくありません" });
+
                 var dbValue = reader.IsDBNull(0) ? null : reader.GetString(0)?.Trim();
+
                 //var hashedPassword = ComputeSha256Hash(pass);
                 if (!string.Equals(dbValue, pass, StringComparison.OrdinalIgnoreCase))
                     return Unauthorized(new { message = "IDもしくはパスワードが正しくありません" });
-                return Ok(new { message = "ログイン成功", employeeNo = emp });
+
+                //認証成功→readerを閉じてmst_userから氏名を取得
+                await reader.CloseAsync();
+
+                const string nameSql = @"SELECT name FROM mst_user WHERE employee_no = @employee_no AND delete_flag = FALSE";
+                using var nameCmd = new NpgsqlCommand(nameSql, _connection);
+                nameCmd.Parameters.AddWithValue("employee_no", emp);
+
+                var nameObj = await nameCmd.ExecuteScalarAsync();
+                //Console.WriteLine($"Login API:employeeNo={emp}, nameObj={nameObj}");
+                if (nameObj == null)
+                    return NotFound(new { message = "ユーザーが見つかりません", employeeNo = emp });
+
+                string name = nameObj?.ToString()?.Trim() ?? emp;
+
+                return Ok(new { message = "ログイン成功", employeeNo = emp,name});
             }
             finally
             {

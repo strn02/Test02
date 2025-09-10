@@ -26,7 +26,11 @@ const Login = () => {
 
             if (response.ok) {
                 // ログイン成功
-                localStorage.setItem("auth", JSON.stringify(data));
+                const authData = {
+                    employeeNo: data.employeeNo,
+                    name: data.name,
+                };
+                localStorage.setItem("auth", JSON.stringify(authData));
                 alert(data.message);
 
                 // ✅ React Router で /top に遷移

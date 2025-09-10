@@ -81,6 +81,8 @@
     outline: none;
     cursor: pointer;
     transition: background 0.3s ease;
+    display: block;
+    margin: 1rem auto 0;
 }
 
     .login-btn:hover,
