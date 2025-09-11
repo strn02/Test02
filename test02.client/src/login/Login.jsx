@@ -31,7 +31,7 @@ const Login = () => {
                     name: data.name,
                 };
                 localStorage.setItem("auth", JSON.stringify(authData));
-                //alert(data.message);
+                alert(data.message);
 
                 // ✅ React Router で /top に遷移
                 navigate("/top");

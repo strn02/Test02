@@ -9,10 +9,10 @@ namespace Test02.Server.Controllers
 {
     [ApiController]
     [Route("[controller]")]
-    public class UsersController : ControllerBase
+    public class AuthController : ControllerBase
     {
         private readonly NpgsqlConnection _connection;
-        public UsersController(NpgsqlConnection connection) => _connection = connection;
+        public AuthController(NpgsqlConnection connection) => _connection = connection;
         // ---- DTO ----
         public class LoginRequest
         {
