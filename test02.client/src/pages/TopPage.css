@@ -24,7 +24,7 @@ body {
     height: 600px;
     display: flex;
     flex-direction: column;
-    justify-content: flex-start;
+    justify-content: space-between;
     position: relative;
 }
 
