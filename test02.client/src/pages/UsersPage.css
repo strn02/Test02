@@ -56,14 +56,92 @@ h1 {
     margin-left: 30px;
 }
 
-.popup {
-    position: fixed;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    background-color: white;
-    border: 1px solid #ccc;
-    padding: 20px;
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-    z-index: 1000;
+.delete-button{
+    background-color: #dd7e6b;
+    border-color: #44546a;
 }
+
+    .delete-button:hover {
+        background-color: #e74c3c;
+    }
+
+.popup-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width:100%;
+    height:100%;
+    background: rgba(0,0,0,0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+.popup {
+    background: #fff;
+    padding:20px 40px;
+    border-radius: 40px;
+    max-width: 100%;
+    box-shadow:0 5px 15px rgba(0,0,0,0.3);
+}
+
+.popup h2{
+    font-size: 40px;
+    font-weight: 500;
+}
+
+.popup button{
+    width: 170px;
+    padding:12px 20px;
+    margin: 5px;
+    border-color:#44546a;
+    border-radius:10px;
+    font-size:20px;
+    cursor:pointer;
+}
+
+.popup .btn-yes{
+    background-color:#a8d08c;
+}
+
+.popup .btn-no {
+    background-color: #dd7e6b;
+}
+
+.popup-delete{
+    text-align:center;
+}
+
+.popup-delete .popup-buttons{
+    display: flex;
+    justify-content: center;
+    gap: 70px;
+}
+
+.form-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr; /* 2óÒ */
+    gap: 15px 20px; /* çsÅEóÒÇÃó]îí */
+}
+
+    .form-grid label {
+        display: block;
+        margin-bottom: 5px;
+        font-weight: bold;
+    }
+
+    .form-grid input {
+        width: 100%;
+        padding: 6px;
+        box-sizing: border-box;
+    }
+
+.radio-group {
+    display: flex;
+    gap: 10px;
+}
+
+
+
+
+
+
