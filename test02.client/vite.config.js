@@ -51,6 +51,11 @@ export default defineConfig({
                 target,
                 changeOrigin: true,
                 secure: false
+            },
+            '/user': {
+            target,
+            changeOrigin: true,
+            secure: false
             }
         },
         port: parseInt(env.DEV_SERVER_PORT || '52917'),
