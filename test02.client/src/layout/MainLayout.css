@@ -100,5 +100,7 @@
 .main-content {
     flex: 1;
     padding: 2rem;
-    background: #f5f6fa;
+    background: #fff;
+    overflow-x: hidden;
+    overflow-y: hidden;
 }
