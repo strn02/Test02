@@ -171,6 +171,59 @@ namespace Test02.Server.Controllers
             }
         }
 
+        [HttpPost("update")]
+        public async Task<IActionResult> Update([FromBody] UserRequest user)
+        {
+            if (string.IsNullOrEmpty(user.EmployeeNo))
+                return BadRequest("社員番号が指定されていません");
+
+            try
+            {
+                if (_connection.State != ConnectionState.Open)
+                    await _connection.OpenAsync();
+
+                const string sql = @"
+            UPDATE mst_user
+            SET name = @name,
+                name_kana = @name_kana,
+                tel_no = @tel_no,
+                mail_address = @mail_address,
+                position = @position,
+                account_level = @account_level,
+                department = @department,
+                age = @age,
+                gender = @gender,
+                retire_date = @retire_date,
+                update_date = @update_date
+            WHERE employee_no = @employee_no;";
+
+                using var cmd = new NpgsqlCommand(sql, _connection);
+                cmd.Parameters.AddWithValue("@employee_no", user.EmployeeNo);
+                cmd.Parameters.AddWithValue("@name", user.Name);
+                cmd.Parameters.AddWithValue("@name_kana", (object?)user.NameKana ?? DBNull.Value);
+                cmd.Parameters.AddWithValue("@tel_no", (object?)user.TelNo ?? DBNull.Value);
+                cmd.Parameters.AddWithValue("@mail_address", (object?)user.MailAddress ?? DBNull.Value);
+                cmd.Parameters.AddWithValue("@position", (object?)user.Position ?? DBNull.Value);
+                cmd.Parameters.AddWithValue("@account_level", (object?)user.AccountLevel ?? DBNull.Value);
+                cmd.Parameters.AddWithValue("@department", (object?)user.Department ?? DBNull.Value);
+                cmd.Parameters.AddWithValue("@age", (object?)user.Age ?? DBNull.Value);
+                cmd.Parameters.AddWithValue("@gender", (object?)user.Gender ?? DBNull.Value);
+                cmd.Parameters.AddWithValue("@retire_date",(object?)user.RetireDate ?? DBNull.Value);
+                cmd.Parameters.AddWithValue("@update_date", DateTime.Now);
+
+                var rows = await cmd.ExecuteNonQueryAsync();
+                if (rows == 0)
+                    return NotFound(new { message = "対象ユーザーが見つかりません" });
+
+                return Ok(new { message = "ユーザー情報を更新しました" });
+            }
+            finally
+            {
+                if (_connection.State == ConnectionState.Open)
+                    await _connection.CloseAsync();
+            }
+        }
+
 
     }
 }
