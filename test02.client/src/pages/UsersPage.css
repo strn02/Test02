@@ -77,6 +77,11 @@ h1 {
     align-items: center;
 }
 .popup {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 20px;
     background: #fff;
     padding:20px 40px;
     border-radius: 40px;
@@ -89,22 +94,23 @@ h1 {
     font-weight: 500;
 }
 
-.popup button{
-    width: 170px;
-    padding:12px 20px;
-    margin: 5px;
-    border-color:#44546a;
-    border-radius:10px;
-    font-size:20px;
-    cursor:pointer;
+.popup-buttons {
+    display: flex;
+    justify-content: center;
+    gap: 40px;
+    margin-top: 20px;
+    font-size: 20px;
+    cursor: pointer;
 }
 
 .popup .btn-yes{
     background-color:#a8d08c;
+    padding: 8px 20px;
 }
 
 .popup .btn-no {
     background-color: #dd7e6b;
+    padding: 8px 20px;
 }
 
 .popup-delete{
@@ -119,8 +125,10 @@ h1 {
 
 .form-grid {
     display: grid;
-    grid-template-columns: 1fr 1fr; /* 2óÒ */
+    grid-template-rows: repeat(5,auto);
+    grid-auto-flow: column;
     gap: 15px 20px; /* çsÅEóÒÇÃó]îí */
+    width: 100%;
 }
 
     .form-grid label {

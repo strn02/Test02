@@ -23,33 +23,38 @@ const UserList = () => {
         accountLevel:""
     })
 
-    {/*一覧表示*/ }
     useEffect(() => {
-        const fetchUsers = async () => {
-            try {
-                const res = await fetch("/user/list");
-                if (!res.ok) throw new Error("ユーザー一覧の取得に失敗しました");
-                const data = await res.json();
-                setUsers(data);
-            } catch (err) {
-                console.error("ユーザー一覧取得失敗:", err);
-            }
-        };
         fetchUsers();
     }, []);
 
+    {/*一覧表示*/ }
+    const fetchUsers = async () => {
+        try {
+            const res = await fetch("/user/list");
+            if (!res.ok) throw new Error("ユーザー一覧の取得に失敗しました");
+            const data = await res.json();
+            setUsers(data);
+        } catch (err) {
+            console.error("ユーザー一覧取得失敗:", err);
+        }
+    };
+
     {/*ユーザー登録*/ }
     const handleRegisterSubmit = async (e) => {
-        e.preventDefault();
+        const payload = {
+            ...formData,
+            age: formData.age ? parseInt(formData.age, 10) : null,
+            gender: formData.gender ? parseInt(formData.gender, 10) : null,
+            retireDate: null,
+            deleteFlag: false
+        };
+
+
         try {
             const res = await fetch("/user/register", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({
-                    ...formData,
-                    retireDate: null,
-                    deleteFlag: false
-                })
+                body: JSON.stringify(payload)
             });
 
             if (!res.ok) throw new Error("登録に失敗しました");
@@ -64,15 +69,40 @@ const UserList = () => {
                 telNo: "",
                 mailAddress: "",
                 age: "",
-                gender: "",
+                gender: "0",
                 position: "",
-                accountLevel: ""
+                accountLevel: "",
+                department: ""
             });
+
+            fetchUsers();
+
         } catch (err) {
             console.error(err);
-            alert("登録に失敗しました");
+            alert("登録失敗しました");
         }
     };
+
+    {/*ユーザー削除*/ }
+    const handleDelete = async (empNo) => {
+        try {
+            const res = await fetch("/user/delete", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ employeeNo: empNo })
+            });
+
+            if (!res.ok) throw new Error("削除に失敗しました");
+
+            alert("削除しました");
+            setShowDeletePopup(false);
+            fetchUsers(); // 再取得して一覧を更新
+        } catch (err) {
+            console.error(err);
+            alert("削除失敗しました");
+        }
+    };
+
 
     return (
         <div>
@@ -158,7 +188,7 @@ const UserList = () => {
                 <div className="popup-overlay">
                     <div className="popup">
                         <h2>新規登録</h2>
-                        <form className="form-grid" onSubmit={handleRegisterSubmit}>
+                        <form className="form-grid">
                             <div>
                                 <label>社員番号</label>
                                 <input type="text" name="employeeNo"
@@ -245,13 +275,13 @@ const UserList = () => {
                                     </label>
                                 </div>
                             </div>
-
-                            {/* ボタン*/}
-                            <div className="popup-buttons">
-                                <button type="submit" className="btn-yes">登録</button>
-                                <button type="button" className="btn-no" onClick={() => setShowRegisterPopup(false)}>キャンセル</button>
-                            </div>
                         </form>
+
+                        {/* ボタン*/}
+                        <div className="popup-buttons">
+                            <button type="button" className="btn-yes" onClick={handleRegisterSubmit}>登録</button>
+                            <button type="button" className="btn-no" onClick={() => setShowRegisterPopup(false)}>キャンセル</button>
+                        </div>
                     </div>
                 </div>
             )}
@@ -264,8 +294,8 @@ const UserList = () => {
                     <div className="popup popup-delete">
                         <h2>本当に削除しますか？</h2>
                         <h3>社員番号:{showDeletePopup.empNo} / 名前:{showDeletePopup.name}</h3>
-                        <div className ="popup-buttons">
-                            <button className="btn-yes" onClick={() => {/* 削除フォームの内容 */ }}>はい</button>
+                        <div className="popup-buttons">
+                            <button className="btn-yes" onClick={() => handleDelete(showDeletePopup.empNo)}>はい</button>
                             <button className="btn-no" onClick={() => setShowDeletePopup(false)}>いいえ</button>
                         </div>
                     </div>
@@ -277,8 +307,10 @@ const UserList = () => {
                 <div className="popup-overlay">
                     <div className="popup popup-edit">
                         <h2>ユーザー編集 - 社員番号: {showEditPopup}</h2>
-                        <button className="btn-yes" onClick={() => {/* 編集フォームの内容 */ }}>変更</button>
-                        <button className="btn-no" onClick={() => setShowEditPopup(null)}>キャンセル</button>
+                        <div className="popup-buttons">
+                            <button className="btn-yes" onClick={() => {/* 編集フォームの内容 */ }}>変更</button>
+                            <button className="btn-no" onClick={() => setShowEditPopup(null)}>キャンセル</button>
+                        </div>
                     </div>
                 </div>
             )}

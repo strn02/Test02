@@ -47,6 +47,7 @@ namespace Test02.Server.Controllers
                                    update_date, department,age,gender,
                                    retire_date,register_date,delete_flag 
                             FROM mst_user 
+                            WHERE delete_flag = false
                             order by employee_no"; 
                 using var cmd = new NpgsqlCommand(sql, _connection); 
                 using var reader = await cmd.ExecuteReaderAsync(); 
@@ -78,5 +79,98 @@ namespace Test02.Server.Controllers
                 if (_connection.State == ConnectionState.Open) await _connection.CloseAsync();
             } 
         }
-    } 
+
+        // ---- /user/register : ユーザー登録 ----
+        [HttpPost("register")]
+        public async Task<IActionResult> Register([FromBody] UserRequest user)
+        {
+            if (user == null) return BadRequest("ユーザー情報が空です");
+
+            try
+            {
+                if (_connection.State != ConnectionState.Open)
+                    await _connection.OpenAsync();
+
+                const string sql = @"
+            INSERT INTO mst_user (
+                employee_no, name, name_kana, tel_no, mail_address,
+                position, account_level, update_date,
+                department, age, gender, retire_date, register_date, delete_flag
+            ) VALUES (
+                @employee_no, @name, @name_kana, @tel_no, @mail_address,
+                @position, @account_level, @update_date,
+                @department, @age, @gender, @retire_date, @register_date, @delete_flag
+            );";
+
+                using var cmd = new NpgsqlCommand(sql, _connection);
+                cmd.Parameters.AddWithValue("@employee_no", user.EmployeeNo);
+                cmd.Parameters.AddWithValue("@name", user.Name);
+                cmd.Parameters.AddWithValue("@update_date", DateTime.Now);
+
+                // null を許容するカラム
+                cmd.Parameters.AddWithValue("@name_kana", (object?)user.NameKana ?? DBNull.Value);
+                cmd.Parameters.AddWithValue("@tel_no", (object?)user.TelNo ?? DBNull.Value);
+                cmd.Parameters.AddWithValue("@mail_address", (object?)user.MailAddress ?? DBNull.Value);
+                cmd.Parameters.AddWithValue("@position", (object?)user.Position ?? DBNull.Value);
+                cmd.Parameters.AddWithValue("@account_level", (object?)user.AccountLevel ?? DBNull.Value);
+                cmd.Parameters.AddWithValue("@department", (object?)user.Department ?? DBNull.Value);
+                cmd.Parameters.AddWithValue("@age", (object?)user.Age ?? DBNull.Value);
+                cmd.Parameters.AddWithValue("@gender", (object?)user.Gender ?? DBNull.Value);
+                cmd.Parameters.AddWithValue("@retire_date", (object?)user.RetireDate ?? DBNull.Value);
+
+                // 登録日は必ず入れる
+                cmd.Parameters.AddWithValue("@register_date", DateTime.Now);
+
+                // 論理削除フラグはデフォルト false
+                cmd.Parameters.AddWithValue("@delete_flag", false);
+
+
+                await cmd.ExecuteNonQueryAsync();
+
+                return Ok(new { message = "ユーザー登録が完了しました" });
+            }
+            finally
+            {
+                if (_connection.State == ConnectionState.Open)
+                    await _connection.CloseAsync();
+            }
+        }
+
+        // ---- /user/delete : ユーザー削除 ----
+        [HttpPost("delete")]
+        public async Task<IActionResult> Delete([FromBody] UserRequest user)
+        {
+            if (string.IsNullOrEmpty(user.EmployeeNo))
+                return BadRequest("社員番号が指定されていません");
+
+            try
+            {
+                if (_connection.State != ConnectionState.Open)
+                    await _connection.OpenAsync();
+
+                const string sql = @"
+            UPDATE mst_user
+            SET delete_flag = true, update_date = @update_date
+            WHERE employee_no = @employee_no;";
+
+                using var cmd = new NpgsqlCommand(sql, _connection);
+                cmd.Parameters.AddWithValue("@employee_no", user.EmployeeNo);
+                cmd.Parameters.AddWithValue("@update_date", DateTime.Now);
+
+                var rows = await cmd.ExecuteNonQueryAsync();
+
+                if (rows == 0)
+                    return NotFound(new { message = "該当するユーザーが見つかりません" });
+
+                return Ok(new { message = "ユーザーを削除しました" });
+            }
+            finally
+            {
+                if (_connection.State == ConnectionState.Open)
+                    await _connection.CloseAsync();
+            }
+        }
+
+
+    }
 }
